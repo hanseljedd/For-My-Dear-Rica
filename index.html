@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Dear Rica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #ead6ff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ead6ff;
+            padding: 15px;
+            z-index: 100;
+            border-bottom: 3px solid #8A5ACD;
+        }
+
+        .header-inner {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .date-counter {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #8A5ACD;
+            background: #ead6ff;
+            padding: 6px 12px;
+            box-shadow: 3px 3px 0 rgba(138, 90, 205, 0.35);
+            min-width: 70px;
+        }
+
+        .date-counter-number {
+            font-size: clamp(1.4em, 4vw, 2em);
+            color: #8A5ACD;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .date-counter-label {
+            font-size: clamp(0.55em, 1.5vw, 0.65em);
+            color: #2B2A2A;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 3px;
+            text-align: center;
+        }
+
+        .date-counter-heart {
+            color: #E8B84B;
+            font-size: 0.75em;
+            margin-top: 2px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: clamp(1.5em, 5vw, 2.5em);
+            color: #8A5ACD;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 rgba(232, 184, 75, 0.2);
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #E8B84B;
+            font-size: clamp(0.75em, 2.5vw, 0.9em);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .search-container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            padding: 0 10px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #8A5ACD;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(14px, 3vw, 16px);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-bar:focus {
+            border-color: #E8B84B;
+            box-shadow: 0 0 0 3px rgba(232, 184, 75, 0.2);
+        }
+
+        .board {
+            margin-top: 160px;
+            padding: 20px 10px;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .board-container {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .letter-card {
+            position: absolute;
+            width: 100%;
+            max-width: 280px;
+            background: #fff;
+            border: 2px solid #8A5ACD;
+            box-shadow: 5px 5px 0 rgba(43, 42, 42, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .letter-card:hover {
+            transform: scale(1.05) rotate(0deg) !important;
+            box-shadow: 8px 8px 0 rgba(232, 184, 75, 0.4);
+            z-index: 50;
+        }
+
+        .letter-card.highlighted {
+            border-color: #E8B84B;
+            border-width: 3px;
+            animation: pulse 1s ease-in-out 3;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .letter-content {
+            padding: 20px;
+        }
+
+        .letter-card.image-letter {
+            padding: 0;
+        }
+
+        .letter-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .letter-image.loaded {
+            opacity: 1;
+        }
+
+        .letter-image:not(.loaded) {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .image-caption {
+            padding: 15px;
+            background: #fff;
+        }
+
+        .letter-date {
+            font-size: 0.9em;
+            color: #8A5ACD;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .letter-title {
+            font-size: 1.3em;
+            color: #E8B84B;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .letter-preview {
+            color: #2B2A2A;
+            line-height: 1.6;
+            font-size: 0.95em;
+            max-height: 150px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .letter-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(transparent, #fff);
+        }
+
+        .letter-type-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #E8B84B;
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 0.75em;
+            border-radius: 3px;
+            letter-spacing: 1px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            max-width: 700px;
+            margin: 20px auto;
+            background: #fff;
+            border: 3px solid #8A5ACD;
+            padding: 25px;
+            position: relative;
+            box-shadow: 10px 10px 0 rgba(43, 42, 42, 0.3);
+        }
+
+        .modal-content.image-modal {
+            max-width: 900px;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            margin-bottom: 25px;
+            border: 2px solid #8A5ACD;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 30px;
+            color: #8A5ACD;
+            cursor: pointer;
+            background: #ead6ff;
+            border: 2px solid #8A5ACD;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #E8B84B;
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .modal-date {
+            color: #8A5ACD;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-title {
+            font-size: clamp(1.3em, 4vw, 2em);
+            color: #E8B84B;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .modal-body {
+            color: #2B2A2A;
+            line-height: 1.8;
+            font-size: clamp(0.95em, 2.5vw, 1.05em);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #8A5ACD;
+            font-size: 1.2em;
+            margin-top: 50px;
+            display: none;
+        }
+
+        .letter-card.polaroid {
+            background: #fff;
+            padding: 15px;
+            padding-bottom: 50px;
+        }
+
+        .letter-card.polaroid .letter-image {
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .polaroid-text {
+            text-align: center;
+            color: #8A5ACD;
+            font-size: 1em;
+            margin-top: -35px;
+        }
+
+        .letter-card.postcard {
+            background: linear-gradient(to right, #fff 50%, #f9f9f9 50%);
+        }
+
+        .postcard-front {
+            padding: 15px;
+        }
+
+        .corner-decoration {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 40px;
+            height: 40px;
+            background: #E8B84B;
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .board {
+                margin-top: 140px;
+                padding: 15px 5px;
+            }
+
+            .letter-card {
+                max-width: calc(50% - 15px);
+            }
+            
+            .title {
+                letter-spacing: 1px;
+            }
+
+            .modal {
+                padding: 10px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                margin: 10px auto;
+            }
+
+            .close-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 25px;
+            }
+
+            .letter-type-badge {
+                font-size: 0.65em;
+                padding: 3px 8px;
+            }
+
+            .date-counter {
+                padding: 4px 8px;
+                min-width: 56px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px;
+            }
+
+            .board {
+                margin-top: 130px;
+            }
+
+            .letter-card {
+                max-width: calc(100% - 20px);
+            }
+
+            .letter-content {
+                padding: 15px;
+            }
+
+            .letter-title {
+                font-size: 1.1em;
+            }
+
+            .letter-preview {
+                font-size: 0.9em;
+                max-height: 120px;
+            }
+
+            .modal-content {
+                padding: 15px;
+                border-width: 2px;
+            }
+
+            .modal-image {
+                max-height: 300px;
+            }
+
+            .date-counter-number {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-inner">
+            <div class="date-counter">
+                <div class="date-counter-number">3</div>
+                <div class="date-counter-label">dates</div>
+                <div class="date-counter-heart">♡</div>
+            </div>
+
+            <h1 class="title">For My Dear Rica ♡</h1>
+            <div class="subtitle">A collection of moments & memories</div>
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search letters, dates, or memories..." id="searchBar">
+            </div>
+        </div>
+    </div>
+
+    <div class="board" id="board">
+        <div class="board-container" id="boardContainer"></div>
+    </div>
+    <div class="no-results" id="noResults">No letters found</div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent">
+            <button class="close-btn" id="closeBtn">×</button>
+            <div class="modal-date" id="modalDate"></div>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div id="modalImageContainer"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const letters = [
+            {
+                date: "August 16, 2026",
+                title: "Brgy. Bunyi",
+                type: "image",
+                image: "images/aug1626.jpg",
+                content: `Guys, I'm winning`
+            },
+            {
+                date: "August 21, 2026",
+                title: "Home Brew",
+                type: "image",
+                image: "images/aug2126.jpg",
+                content: `First move?`
+            },
+            {
+                date: "August 24, 2026",
+                title: "Tsunami",
+                type: "text",
+                content: `Hi, my body wants to sleep but my heart won't let me; not after telling you how much I really appreciate you.
+
+I want to tell you a short part of my diary.
+
+I’ve noticed something about books I love.
+
+They change depending on when I read them. A line that once meant nothing suddenly feels personal. A paragraph I skimmed before now asks me to stop.
+
+The text doesn’t change, but I do.
+
+I think people are like that too.
+
+We meet them at one moment, with one version of ourselves, and think we understand the story. But later — after time has added revisions — we realize we missed something important in the margins.
+
+You feel like that to me now. Something I didn’t fully read yet.
+
+For much of my life I refrain from being silly with someone because the thought of being myself seemed to disappoint others. But with this span of time I've know u, I can turn off my mind yet still think about you. You're the kind of mystery I've been fond of, and knowing you more makes me admire you more. 
+
+And I know I'm without position to say this and it might be too soon but my hearts bursts with much of it to not say aloud to you. 
+
+I like you, Rica. I think I wished for you all my life.
+
+I'm very much excited to say it for the first time for I know I will be saying it 'til God knows how long.
+
+I admire you so much, I hope you know that.`
+            },
+            {
+                date: "September 8, 2026",
+                title: "Fusion",
+                type: "image",
+                image: "images/sept0826.jpg",
+                content: `INC to Tomoro to Fusion to Altar...`
+            },
+
+        ];
+        
+
+        const board = document.getElementById('board');
+        const boardContainer = document.getElementById('boardContainer');
+        const searchBar = document.getElementById('searchBar');
+        const modal = document.getElementById('modal');
+        const closeBtn = document.getElementById('closeBtn');
+        const noResults = document.getElementById('noResults');
+        const modalContent = document.getElementById('modalContent');
+
+        let letterElements = [];
+
+        function positionLetters() {
+            const isMobile = window.innerWidth <= 480;
+            const isTablet = window.innerWidth <= 768 && window.innerWidth > 480;
+            
+            let columns, cardWidth, gap;
+            
+            if (isMobile) {
+                columns = 1;
+                cardWidth = window.innerWidth - 30;
+                gap = 15;
+            } else if (isTablet) {
+                columns = 2;
+                cardWidth = (window.innerWidth - 60) / 2;
+                gap = 20;
+            } else {
+                columns = 4;
+                cardWidth = 280;
+                gap = 30;
+            }
+            
+            const columnHeights = new Array(columns).fill(0);
+            const totalWidth = (columns * cardWidth) + ((columns + 1) * gap);
+            boardContainer.style.width = totalWidth + 'px';
+
+            letters.forEach((letter, index) => {
+                const card = document.createElement('div');
+                card.className = 'letter-card';
+                
+                if (Math.random() > 0.7) {
+                    card.innerHTML += '<div class="corner-decoration"></div>';
+                }
+
+                if (letter.type === 'image') {
+                    card.classList.add('image-letter', 'polaroid');
+                    card.innerHTML += `
+                        <img data-src="${letter.image}" alt="${letter.title}" class="letter-image" />
+                        <div class="image-caption">
+                            <div class="letter-date">${letter.date}</div>
+                            <div class="letter-title">${letter.title}</div>
+                        </div>
+                        <div class="letter-type-badge">📷 PHOTO</div>
+                    `;
+                } else {
+                    card.innerHTML += `
+                        <div class="letter-content">
+                            <div class="letter-date">${letter.date}</div>
+                            <div class="letter-title">${letter.title}</div>
+                            <div class="letter-preview">${letter.content.substring(0, 150)}...</div>
+                        </div>
+                        <div class="letter-type-badge">✉️ LETTER</div>
+                    `;
+                }
+
+                const shortestColumn = columnHeights.indexOf(Math.min(...columnHeights));
+                const x = shortestColumn * (cardWidth + gap) + gap;
+                const y = columnHeights[shortestColumn] + gap;
+
+                const rotation = isMobile ? 0 : (Math.random() - 0.5) * 4;
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+                card.style.transform = `rotate(${rotation}deg)`;
+                card.style.width = cardWidth + 'px';
+
+                const cardHeight = letter.type === 'image' ? 320 : 270;
+                columnHeights[shortestColumn] += cardHeight;
+
+                card.addEventListener('click', () => openModal(letter));
+                
+                card.dataset.searchText = `${letter.date} ${letter.title} ${letter.content}`.toLowerCase();
+                
+                boardContainer.appendChild(card);
+                letterElements.push(card);
+            });
+
+            boardContainer.style.height = Math.max(...columnHeights) + 100 + 'px';
+        }
+
+        function openModal(letter) {
+            document.getElementById('modalDate').textContent = letter.date;
+            document.getElementById('modalTitle').textContent = letter.title;
+            
+            const imageContainer = document.getElementById('modalImageContainer');
+            
+            if (letter.type === 'image') {
+                modalContent.classList.add('image-modal');
+                imageContainer.innerHTML = `<img src="${letter.image}" alt="${letter.title}" class="modal-image" />`;
+            } else {
+                modalContent.classList.remove('image-modal');
+                imageContainer.innerHTML = '';
+            }
+            
+            document.getElementById('modalBody').textContent = letter.content;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            letterElements.forEach(card => {
+                const matches = card.dataset.searchText.includes(searchTerm);
+                
+                if (matches) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                    
+                    if (searchTerm && searchTerm.length > 2) {
+                        card.classList.add('highlighted');
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        card.classList.remove('highlighted');
+                    }
+                } else {
+                    card.style.display = 'none';
+                    card.classList.remove('highlighted');
+                }
+            });
+
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+
+        function lazyLoadImages() {
+            const imageCards = document.querySelectorAll('.letter-image');
+            
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.add('loaded');
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            imageCards.forEach(img => imageObserver.observe(img));
+        }
+
+        let allLetterData = [];
+        
+        function initializeBoard() {
+            allLetterData = [...letters];
+            positionLetters();
+            lazyLoadImages();
+        }
+
+        initializeBoard();
+
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                boardContainer.innerHTML = '';
+                letterElements = [];
+                positionLetters();
+                lazyLoadImages();
+            }, 300);
+        });
+    </script>
+</body>
+</html>
